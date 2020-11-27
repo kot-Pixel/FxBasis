@@ -50,7 +50,24 @@ public class VestApi {
         );
         Call<VestResponseModel> model2 = api.repo("/admin/client/vestSign.do?vestCode=CUHX4A73&version=1.0&channelCode=google&deviceId=ebe2f38b83fcd5d1&timestamp=1584324183767");
 
-        model2.enqueue(new Callback<VestResponseModel>() {
+        Call<VestResponseModel> model3 = api.repo3()
+        /**
+         * 异步网络请求
+         */
+//        model2.enqueue(new Callback<VestResponseModel>() {
+//            @Override
+//            public void onResponse(Call<VestResponseModel> call, Response<VestResponseModel> response) {
+//                Log.i(TAG, "onResponse: "+ response.isSuccessful());
+//                Log.i(TAG, "onResponse: " + response.body());
+//            }
+//
+//            @Override
+//            public void onFailure(Call<VestResponseModel> call, Throwable t) {
+//                Log.i(TAG, "onResponse: " + t.getMessage());
+//            }
+//        });
+
+        model3.enqueue(new Callback<VestResponseModel>() {
             @Override
             public void onResponse(Call<VestResponseModel> call, Response<VestResponseModel> response) {
                 Log.i(TAG, "onResponse: "+ response.isSuccessful());
