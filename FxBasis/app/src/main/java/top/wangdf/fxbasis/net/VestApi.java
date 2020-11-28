@@ -1,17 +1,17 @@
 package top.wangdf.fxbasis.net;
 
-import android.util.Log;
-
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import top.wangdf.fxbasis.common.ApiResult;
+import top.wangdf.fxbasis.entity.VestEntity;
 import top.wangdf.fxbasis.entity.VestResponseModel;
 
 public class VestApi {
 
-    private static final String HOST = "https://d2d0drb98uxrz0.cloudfront.net";
+    private static final String HOST = "https://api.waizhangkuaiji.com";
 
     private static final String PATH = "/admin/client/vestSign.do?";
 
@@ -28,56 +28,27 @@ public class VestApi {
         return retrofit;
     }
 
-    /**
-     * https://d2d0drb98uxrz0.cloudfront.net/admin/client/vestSign.do?
-     * vestCode=CUHX4A73
-     * &version=1.0
-     * &channelCode=google
-     * &deviceId=ebe2f38b83fcd5d1
-     * &timestamp=1584324183767
-     *
-     *
-     */
 
-    public void test() {
+    public void makeVestRequest(VestEntity entity) {
         ApiInterface api = createRetrofit().create(ApiInterface.class);
-        Call<VestResponseModel> model = api.repo2(PATH,
-                "CUHX4A73",
-                "1.0",
-                "google",
-                "ebe2f38b83fcd5d1",
-                "1584324183767"
-        );
-        Call<VestResponseModel> model2 = api.repo("/admin/client/vestSign.do?vestCode=CUHX4A73&version=1.0&channelCode=google&deviceId=ebe2f38b83fcd5d1&timestamp=1584324183767");
-
-        Call<VestResponseModel> model3 = api.repo3()
+        Call<VestResponseModel> model3 = api.repo3();//未使用传参
+//        ?&version=1.0&channelCode=google&deviceId=ebe2f38b83fcd5d1&timestamp=1584324183767
+        Call<VestResponseModel> model4 = api.repo4(entity.getVestCode(), entity.getVersion(), entity.getChannelCode(), entity.getDevicesId(), entity.getTimestamp());
+        ApiResult result = null;
         /**
          * 异步网络请求
          */
-//        model2.enqueue(new Callback<VestResponseModel>() {
-//            @Override
-//            public void onResponse(Call<VestResponseModel> call, Response<VestResponseModel> response) {
-//                Log.i(TAG, "onResponse: "+ response.isSuccessful());
-//                Log.i(TAG, "onResponse: " + response.body());
-//            }
-//
-//            @Override
-//            public void onFailure(Call<VestResponseModel> call, Throwable t) {
-//                Log.i(TAG, "onResponse: " + t.getMessage());
-//            }
-//        });
-
-        model3.enqueue(new Callback<VestResponseModel>() {
+        model4.enqueue(new Callback<VestResponseModel>() {
             @Override
             public void onResponse(Call<VestResponseModel> call, Response<VestResponseModel> response) {
-                Log.i(TAG, "onResponse: "+ response.isSuccessful());
-                Log.i(TAG, "onResponse: " + response.body());
+                ApiResult result = new ApiResult(response.code(), response.body(), response.code() == 200, null, "");
             }
 
             @Override
             public void onFailure(Call<VestResponseModel> call, Throwable t) {
-                Log.i(TAG, "onResponse: " + t.getMessage());
+                new ApiResult(500, null, false, t, "Error");
             }
         });
+
     }
 }

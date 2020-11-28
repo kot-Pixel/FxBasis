@@ -55,6 +55,35 @@ public class VestResponseSubModel {
         return adjustToken;
     }
 
+    @Override
+    public String toString() {
+        return "VestResponseSubModel{" +
+                "adjustToken='" + adjustToken + '\'' +
+                ", umKey='" + umKey + '\'' +
+                ", fieldCol='" + fieldCol + '\'' +
+                ", gtSecert='" + gtSecert + '\'' +
+                ", screenDirect='" + screenDirect + '\'' +
+                ", umkeyIOS='" + umkeyIOS + '\'' +
+                ", version='" + version + '\'' +
+                ", h5Url='" + h5Url + '\'' +
+                ", gtMaster='" + gtMaster + '\'' +
+                ", gtKey='" + gtKey + '\'' +
+                ", backgroundCol='" + backgroundCol + '\'' +
+                ", advOn='" + advOn + '\'' +
+                ", advImg='" + advImg + '\'' +
+                ", advUrl='" + advUrl + '\'' +
+                ", gtId='" + gtId + '\'' +
+                ", um='" + um + '\'' +
+                ", anUmengKey='" + anUmengKey + '\'' +
+                ", channelName='" + channelName + '\'' +
+                ", screenOn='" + screenOn + '\'' +
+                ", vestCode='" + vestCode + '\'' +
+                ", vestName='" + vestName + '\'' +
+                ", channelCode='" + channelCode + '\'' +
+                ", status='" + status + '\'' +
+                '}';
+    }
+
     public void setAdjustToken(String adjustToken) {
         this.adjustToken = adjustToken;
     }

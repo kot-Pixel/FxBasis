@@ -8,8 +8,7 @@ vestCode: 马甲代码
         version: App当前版本名(例如1.0.0)
         deviceId: 设备ID(设备唯一id)
         timestamp: 时间戳(系统时间)*/
-public class VestPostEntity {
-    private String queryHost;
+public class VestEntity {
 
     private String vestCode;
 
@@ -19,12 +18,22 @@ public class VestPostEntity {
 
     private String timestamp;
 
-    public String getQueryHost() {
-        return queryHost;
+    private String channelCode;
+
+    public VestEntity(String vestCode, String version, String devicesId, String timestamp, String channelCode) {
+        this.vestCode = vestCode;
+        this.version = version;
+        this.devicesId = devicesId;
+        this.timestamp = timestamp;
+        this.channelCode = channelCode;
     }
 
-    public void setQueryHost(String queryHost) {
-        this.queryHost = queryHost;
+    public String getChannelCode() {
+        return channelCode;
+    }
+
+    public void setChannelCode(String channelCode) {
+        this.channelCode = channelCode;
     }
 
     public String getVestCode() {
@@ -54,7 +63,6 @@ public class VestPostEntity {
     @Override
     public String toString() {
         return "VestPostEntity{" +
-                "queryHost='" + queryHost + '\'' +
                 ", vestCode='" + vestCode + '\'' +
                 ", version='" + version + '\'' +
                 ", devicesId='" + devicesId + '\'' +
@@ -70,8 +78,7 @@ public class VestPostEntity {
         this.timestamp = timestamp;
     }
 
-    public VestPostEntity(String queryHost, String vestCode, String version, String devicesId, String timestamp) {
-        this.queryHost = queryHost;
+    public VestEntity(String vestCode, String version, String devicesId, String timestamp) {
         this.vestCode = vestCode;
         this.version = version;
         this.devicesId = devicesId;

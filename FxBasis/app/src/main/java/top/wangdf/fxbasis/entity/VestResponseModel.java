@@ -59,4 +59,13 @@ public class VestResponseModel {
     public void setData(VestResponseSubModel data) {
         this.data = data;
     }
+
+    @Override
+    public String toString() {
+        return "VestResponseModel{" +
+                "code='" + code + '\'' +
+                ", msg='" + msg + '\'' +
+                ", data=" + data +
+                '}';
+    }
 }
