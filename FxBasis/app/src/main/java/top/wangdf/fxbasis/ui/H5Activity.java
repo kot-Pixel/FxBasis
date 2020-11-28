@@ -46,7 +46,7 @@ public class H5Activity extends AppCompatActivity {
         String userAgentString = webSettings.getUserAgentString();
         userAgentString = "ANDROID_AGENT_NATIVE/2.0" + " " + userAgentString;
         webSettings.setUserAgentString(userAgentString);
-        webView.addJavascriptInterface(new AppJs(this), "AppJs");
+        webView.addJavascriptInterface(new AppJs(this,webView,H5Activity.this), "AppJs");
         webView.setLayerType(View.LAYER_TYPE_HARDWARE, null);//webView 打开链接使用硬件加速
         webSettings.setJavaScriptEnabled(true);//调试在WebViews中运行的Web布局和JavaScript代码
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);//JavaScript 可以打开window
