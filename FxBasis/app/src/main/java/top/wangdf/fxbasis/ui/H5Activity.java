@@ -4,13 +4,19 @@ import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.DocumentsContract;
+import android.provider.MediaStore;
 import android.provider.Settings;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.webkit.DownloadListener;
@@ -21,7 +27,6 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
 
@@ -30,6 +35,13 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Iterator;
 
 import io.branch.referral.util.BranchEvent;
@@ -45,10 +57,9 @@ public class H5Activity extends AppCompatActivity {
     private Activity activity;
 
     public ValueCallback<Uri[]> uploadMessage;
-    private ValueCallback<Uri> mUploadMessage;
     public static final int REQUEST_SELECT_FILE = 100;
-    private final static int FILECHOOSER_RESULTCODE = 1;
     private AppCompatTextView titleBarTv;
+    private String base64Code;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -126,7 +137,7 @@ public class H5Activity extends AppCompatActivity {
 
     private void initView() {
         webView = findViewById(R.id.webView);
-        titleBarTv = findViewById(R.id.titleBarTv);
+//        titleBarTv = findViewById(R.id.titleBarTv);
         webSettings = webView.getSettings();//获取WebSettings
     }
 
@@ -159,7 +170,7 @@ public class H5Activity extends AppCompatActivity {
         @NonNull
         public String getDeviceId() {
             Log.i(TAG, "getDeviceId: execute");
-            return  Utils.getDeviceId(context);//获取Android_id
+            return Utils.getDeviceId(context);//获取Android_id
         }
 
         /**
@@ -240,16 +251,26 @@ public class H5Activity extends AppCompatActivity {
             // TODO
             // 参考实现：成员变量记录下js方法名，图片转成base64字符串后调用该js方法传递给H5
             // 下面一段代码仅供参考，能实现功能即可
-            Log.i(TAG, "takePortraitPicture:  Execute");
-            String str = "";
-            if (!TextUtils.isEmpty(callbackMethod)) {
-                StringBuilder builder = new StringBuilder(callbackMethod).append("(");
-                builder.append("'").append("data:image/png;base64,").append(str).append("'");
-                builder.append(")");
-                String method = builder.toString();
-                String javaScript = "javascript:" + method;
-                webView.evaluateJavascript(javaScript, null);
-            }
+            Log.i(TAG, "takePortraitPicture:  Execute" + callbackMethod);
+            StringBuilder builder = new StringBuilder(callbackMethod).append("(");
+            builder.append("'").append("data:image/png;base64,").append(base64Code).append("'");
+            builder.append(")");
+            String method = builder.toString();
+            String javaScript = "javascript:" + method;
+            webView.evaluateJavascript(javaScript, null);//javascript:funback 函数调用不产生任何的作用
+            /**             * function androidSelectFileImage(){
+             *         if(getDt.getPlatForm() == 'android'){
+             *             window.AppJs.takePortraitPicture('funBack')
+             *         }else{
+             *             return ;
+             *         }
+             *     }
+             *     //下面的的funBack并没有产生任何作用？？？？
+             *     window.funBack = function(m){
+             *         alert(m);
+             *     }
+
+             */
         }
 
         /**
@@ -278,10 +299,9 @@ public class H5Activity extends AppCompatActivity {
          */
         @JavascriptInterface
         public void isContainsName(final String callbackMethod, String name) {
-            final boolean has = false;
-            //TODO 遍历所有提供的@JavascriptInterface，判断否含有name方法，把结果通过JavaScript反馈给H5
-//        has =
+            //通过反射来判断的对应的类是否存在方法
             Log.i(TAG, "isContainsName:  Execute");
+            final boolean has = judgeFunctionExist(name);
             //以下是回调给H5的部分
             activity.runOnUiThread(new Runnable() {
                 @Override
@@ -290,6 +310,21 @@ public class H5Activity extends AppCompatActivity {
                     webView.evaluateJavascript(javaScript, null);
                 }
             });
+        }
+
+        private Boolean judgeFunctionExist(String functionName) {
+            boolean exist = false;
+            try {
+                Class clz = Class.forName(AppJs.class.getName());
+                for (Method declaredMethod : clz.getDeclaredMethods()) {
+                    if (declaredMethod.getName().equals(functionName)) {
+                        exist = true;
+                    }
+                }
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+            return exist;
         }
 
         /**
@@ -504,7 +539,7 @@ public class H5Activity extends AppCompatActivity {
          */
         @JavascriptInterface
         public void firebaseEvent(String category, String parameters) throws JSONException {
-            Log.i(TAG, "firebaseEvent:  Excute");
+            Log.i(TAG, "firebaseEvent:  Execute");
             JSONObject obj = new JSONObject(parameters);
             Bundle bundle = new Bundle();
             Iterator<String> keys = obj.keys();
@@ -518,24 +553,45 @@ public class H5Activity extends AppCompatActivity {
 
     }
 
+
+    public void imageToBase64(Uri[] uris) {
+        InputStream is = null;
+        byte[] data = null;
+        String result = null;
+        try {
+            is = context.getContentResolver().openInputStream(uris[0]);
+            //创建一个字符流大小的数组。
+            data = new byte[is.available()];
+            is.read(data);
+            result = Base64.encodeToString(data, Base64.NO_WRAP);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (null != is) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+        }
+        base64Code = result;
+    }
+
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (requestCode == REQUEST_SELECT_FILE) {
                 if (uploadMessage == null)
                     return;
+                Log.i("AppJS", "onActivityResult: " + WebChromeClient.FileChooserParams.parseResult(resultCode, data));
                 uploadMessage.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
+                imageToBase64(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
                 uploadMessage = null;
             }
-        } else if (requestCode == FILECHOOSER_RESULTCODE) {
-            if (null == mUploadMessage)
-                return;
-            // Use MainActivity.RESULT_OK if you're implementing WebView inside Fragment
-            // Use RESULT_OK only if you're implementing WebView inside an Activity
-            Uri result = data.getData();
-            mUploadMessage.onReceiveValue(result);
-            mUploadMessage = null;
         }
     }
 }
