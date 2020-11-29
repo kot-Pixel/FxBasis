@@ -68,6 +68,15 @@ public class H5Activity extends AppCompatActivity {
     private ImageButton backupImageBtn;
     private TextView titleBarTitle;
     private LinearLayout allLayout;
+    private int shouldForbidBackPress;
+
+    public int getShouldForbidBackPress() {
+        return shouldForbidBackPress;
+    }
+
+    public void setShouldForbidBackPress(int shouldForbidBackPress) {
+        this.shouldForbidBackPress = shouldForbidBackPress;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +87,7 @@ public class H5Activity extends AppCompatActivity {
         initView();
         initAction();
         initWebSetting();//初始化webView 相关Setting
+        shouldForbidBackPress = 1;
     }
 
     @SuppressLint("JavascriptInterface")
@@ -141,6 +151,12 @@ public class H5Activity extends AppCompatActivity {
 
     private void initAction() {
         webView.loadUrl(link);//加载业务链接
+        backupImageBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
     }
 
     private void initView() {
@@ -358,7 +374,7 @@ public class H5Activity extends AppCompatActivity {
             //TODO 以下仅供参考
             Log.i(TAG, "shouldForbidSysBackPress:  Execute");
             //WebActivity成员变量记录下是否禁止
-//        mContext.setShouldForbidBackPress(forbid);
+            setShouldForbidBackPress(forbid);
             //WebActivity 重写onBackPressed方法 变量为1时禁止返回操作
         }
 
@@ -371,11 +387,11 @@ public class H5Activity extends AppCompatActivity {
         @JavascriptInterface
         public void forbidBackForJS(int forbid, String methodName) {
             //TODO 以下仅供参考
-//        mContext.setShouldForbidBackPress(forbid);
+//        setShouldForbidBackPress(forbid);
             //同上
-//        mContext.setBackPressJSMethod(methodName);
+//        setBackPressJSMethod(methodName);
             //WebActivity成员变量记录下js方法名 在禁止返回时调用js方法
-            Log.i(TAG, "forbidBackForJS:  Excute");
+            Log.i(TAG, "forbidBackForJS:  Execute");
         }
 
 
@@ -613,6 +629,14 @@ public class H5Activity extends AppCompatActivity {
                 imageToBase64(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
                 uploadMessage = null;
             }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Log.i("AppJS", "onBackPressed: ");
+        if (shouldForbidBackPress != 1) {
+            super.onBackPressed();
         }
     }
 }
