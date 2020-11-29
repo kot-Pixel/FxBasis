@@ -16,6 +16,8 @@ allprojects {
     repositories {
         google()
         jcenter()
+        //华为不支持的Google 移动服务的处理方式
+        maven { url 'http://developer.huawei.com/repo/' }
     }
 }
 

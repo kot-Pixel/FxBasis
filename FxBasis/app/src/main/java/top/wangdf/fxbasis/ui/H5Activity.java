@@ -19,12 +19,17 @@ import android.text.TextUtils;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -58,8 +63,11 @@ public class H5Activity extends AppCompatActivity {
 
     public ValueCallback<Uri[]> uploadMessage;
     public static final int REQUEST_SELECT_FILE = 100;
-    private AppCompatTextView titleBarTv;
     private String base64Code;
+    private RelativeLayout titleBarLayout;
+    private ImageButton backupImageBtn;
+    private TextView titleBarTitle;
+    private LinearLayout allLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -139,6 +147,10 @@ public class H5Activity extends AppCompatActivity {
         webView = findViewById(R.id.webView);
 //        titleBarTv = findViewById(R.id.titleBarTv);
         webSettings = webView.getSettings();//获取WebSettings
+        titleBarLayout = findViewById(R.id.titleBar);
+        allLayout = findViewById(R.id.allLayout);
+        backupImageBtn = findViewById(R.id.backUpImageBtn);
+        titleBarTitle = findViewById(R.id.titleBarTv);
     }
 
     class MyWebChromeClient extends WebChromeClient {
@@ -281,14 +293,23 @@ public class H5Activity extends AppCompatActivity {
          */
         @JavascriptInterface
         public void showTitleBar(boolean visible) {
-            //TODO
+            //直接setVisibility的话，Activity 不会产生任何的变动。开启线程来执行titleBar的显示和隐藏
+            titleBarLayout.clearAnimation();
             if (visible) {
-                titleBarTv.setVisibility(View.VISIBLE);
+                allLayout.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        titleBarLayout.setVisibility(View.VISIBLE);
+                    }
+                });
             } else {
-                titleBarTv.setVisibility(View.GONE);
+                allLayout.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        titleBarLayout.setVisibility(View.GONE);
+                    }
+                });
             }
-
-            Log.i(TAG, "showTitleBar:  Execute " + visible);
         }
 
         /**

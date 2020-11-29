@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">FxBasis</string>
+    <string name="h5_titleBar_title">TitleBar</string>
 </resources>
