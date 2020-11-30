@@ -35,6 +35,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.analytics.FirebaseAnalytics;
 
 import org.json.JSONException;
@@ -273,6 +277,8 @@ public class H5Activity extends AppCompatActivity {
          * base64使用格式：Base64.NO_WRAP
          *
          * @param callbackMethod 回传图片时调用H5的方法名
+         *
+         * 使用Webview 联调判断是否执行Js
          */
         @JavascriptInterface
         public void takePortraitPicture(String callbackMethod) {
@@ -300,6 +306,8 @@ public class H5Activity extends AppCompatActivity {
 
              */
         }
+
+
 
         /**
          * 控制webview是否显示 TitleBar
@@ -614,6 +622,24 @@ public class H5Activity extends AppCompatActivity {
 
         }
         base64Code = result;
+    }
+
+    private void attemptLoginGoogle() {
+        //初始化gso，google_sign_up_client_id为添加的客户端id
+        GoogleSignInOptions gso = new GoogleSignInOptions
+                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(context.getString(R.string.google_sign_up_client_id))
+                .requestEmail()
+                .build();
+        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(context, gso);
+        //登录前可以查看是否已经授权，已经授权则可不必重复授权，如果返回的额account不为空则已经授权.
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(context);
+        if (account != null) {
+            Log.i("AppJs", "授权通过");
+        } else {
+            Log.i("AppJs", "授权不通过");
+        }
+        startActivity(mGoogleSignInClient.getSignInIntent());
     }
 
 
