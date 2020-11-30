@@ -1,5 +1,6 @@
 package top.wangdf.fxbasis.ui;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
@@ -7,6 +8,7 @@ import android.content.ActivityNotFoundException;
 import android.content.ContentUris;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
@@ -26,14 +28,17 @@ import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatTextView;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
@@ -73,6 +78,7 @@ public class H5Activity extends AppCompatActivity {
     private TextView titleBarTitle;
     private LinearLayout allLayout;
     private int shouldForbidBackPress;
+    private int readExternalPermission = 100;
 
     public int getShouldForbidBackPress() {
         return shouldForbidBackPress;
@@ -88,10 +94,39 @@ public class H5Activity extends AppCompatActivity {
         setContentView(R.layout.activity_h5);
         context = this;
         activity = this;
-        initView();
-        initAction();
-        initWebSetting();//初始化webView 相关Setting
+
+        checkPermission();
         shouldForbidBackPress = 1;
+    }
+
+    private void checkPermission() {
+        //检测是否有拨打电话的权限
+        int checkSelfPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
+        if (checkSelfPermission == PackageManager.PERMISSION_GRANTED) {
+            initView();
+            initAction();
+            initWebSetting();//初始化webView 相关Setting
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, readExternalPermission);//动态申请打电话权限
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case 100:
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    initView();
+                    initAction();
+                    initWebSetting();
+                } else {
+                    Toast.makeText(this, "??", Toast.LENGTH_SHORT).show();
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     @SuppressLint("JavascriptInterface")
@@ -121,7 +156,7 @@ public class H5Activity extends AppCompatActivity {
         //        // onShowFileChooser() 选择文件(图片)
         webView.setWebChromeClient(new MyWebChromeClient());
 // onPageFinished在里面可以获取webView.getTitle()给titlebar设置标题
-//        webView.setWebViewClient();
+//        webView.setWebViewClient(new MyWebViewClient());
 
         webView.clearHistory();
         webView.setDrawingCacheEnabled(true);
@@ -191,6 +226,14 @@ public class H5Activity extends AppCompatActivity {
                 return false;
             }
             return true;
+        }
+    }
+
+    class MyWebViewClient extends WebViewClient {
+        @Override
+        public void onPageFinished(WebView view, String url) {
+            titleBarTitle.setText(view.getTitle());
+            super.onPageFinished(view, url);
         }
     }
 
@@ -290,8 +333,14 @@ public class H5Activity extends AppCompatActivity {
             builder.append("'").append("data:image/png;base64,").append(base64Code).append("'");
             builder.append(")");
             String method = builder.toString();
-            String javaScript = "javascript:" + method;
-            webView.evaluateJavascript(javaScript, null);//javascript:funback 函数调用不产生任何的作用
+            final String javaScript = "javascript:" + method;
+            webView.post(new Runnable() {
+                @Override
+                public void run() {
+                    webView.evaluateJavascript(javaScript, null);//javascript:funback 函数调用不产生任何的作用
+                }
+            });
+            Log.i(TAG, "takePortraitPicture: " + "webview调用js结束");
             /**             * function androidSelectFileImage(){
              *         if(getDt.getPlatForm() == 'android'){
              *             window.AppJs.takePortraitPicture('funBack')
@@ -624,23 +673,23 @@ public class H5Activity extends AppCompatActivity {
         base64Code = result;
     }
 
-    private void attemptLoginGoogle() {
-        //初始化gso，google_sign_up_client_id为添加的客户端id
-        GoogleSignInOptions gso = new GoogleSignInOptions
-                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(context.getString(R.string.google_sign_up_client_id))
-                .requestEmail()
-                .build();
-        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(context, gso);
-        //登录前可以查看是否已经授权，已经授权则可不必重复授权，如果返回的额account不为空则已经授权.
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(context);
-        if (account != null) {
-            Log.i("AppJs", "授权通过");
-        } else {
-            Log.i("AppJs", "授权不通过");
-        }
-        startActivity(mGoogleSignInClient.getSignInIntent());
-    }
+//    private void attemptLoginGoogle() {
+//        //初始化gso，google_sign_up_client_id为添加的客户端id
+//        GoogleSignInOptions gso = new GoogleSignInOptions
+//                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//                .requestIdToken(context.getString(R.string.google_sign_up_client_id))
+//                .requestEmail()
+//                .build();
+//        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(context, gso);
+//        //登录前可以查看是否已经授权，已经授权则可不必重复授权，如果返回的额account不为空则已经授权.
+//        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(context);
+//        if (account != null) {
+//            Log.i("AppJs", "授权通过");
+//        } else {
+//            Log.i("AppJs", "授权不通过");
+//        }
+//        startActivity(mGoogleSignInClient.getSignInIntent());
+//    }
 
 
     @Override
