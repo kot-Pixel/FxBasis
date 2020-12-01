@@ -12,6 +12,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         <activity android:name=".ui.H5Activity">
+
+
+        </activity>
+        <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -24,10 +28,6 @@
                 <category android:name="android.intent.category.DEFAULT" /><!-- 响应隐式的Intent-->
                 <category android:name="android.intent.category.BROWSABLE" /><!---->
             </intent-filter>
-
-        </activity>
-        <activity android:name=".MainActivity">
-
         </activity>
     </application>
 

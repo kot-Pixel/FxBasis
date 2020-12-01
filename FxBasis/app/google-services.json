@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "393053980436",
+    "firebase_url": "https://fxbasisone-1606737618140.firebaseio.com",
+    "project_id": "fxbasisone-1606737618140",
+    "storage_bucket": "fxbasisone-1606737618140.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:393053980436:android:f72f576f60d416dff36401",
+        "android_client_info": {
+          "package_name": "top.wangdf.fxbasis"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "393053980436-gphhu1p87k93hc7u2mgr3smnrgg5nr2f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "top.wangdf.fxbasis",
+            "certificate_hash": "3015bf1b8ed68f4d112ff0cb15280f24417e5545"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAe0nozTGKBPLdKgs7PIudDJLW-mL52snc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

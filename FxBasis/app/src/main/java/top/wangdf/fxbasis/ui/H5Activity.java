@@ -311,6 +311,7 @@ public class H5Activity extends AppCompatActivity {
         public void openGoogle(String data) {
             //TODO
             Log.i(TAG, "openGoogle:  Execute");
+            attemptLoginGoogle();
         }
 
 
@@ -673,23 +674,23 @@ public class H5Activity extends AppCompatActivity {
         base64Code = result;
     }
 
-//    private void attemptLoginGoogle() {
-//        //初始化gso，google_sign_up_client_id为添加的客户端id
-//        GoogleSignInOptions gso = new GoogleSignInOptions
-//                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-//                .requestIdToken(context.getString(R.string.google_sign_up_client_id))
-//                .requestEmail()
-//                .build();
-//        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(context, gso);
-//        //登录前可以查看是否已经授权，已经授权则可不必重复授权，如果返回的额account不为空则已经授权.
-//        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(context);
-//        if (account != null) {
-//            Log.i("AppJs", "授权通过");
-//        } else {
-//            Log.i("AppJs", "授权不通过");
-//        }
-//        startActivity(mGoogleSignInClient.getSignInIntent());
-//    }
+    private void attemptLoginGoogle() {
+        //初始化gso，google_sign_up_client_id为添加的客户端id
+        GoogleSignInOptions gso = new GoogleSignInOptions
+                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(context.getString(R.string.google_sign_up_client_id))
+                .requestEmail()
+                .build();
+        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(context, gso);
+        //登录前可以查看是否已经授权，已经授权则可不必重复授权，如果返回的额account不为空则已经授权.
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(context);
+        if (account != null) {
+            Log.i("AppJs", "授权通过");
+        } else {
+            Log.i("AppJs", "授权不通过");
+        }
+        startActivity(mGoogleSignInClient.getSignInIntent());
+    }
 
 
     @Override
