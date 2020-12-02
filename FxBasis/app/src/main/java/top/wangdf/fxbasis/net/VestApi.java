@@ -1,10 +1,13 @@
 package top.wangdf.fxbasis.net;
 
+import android.util.Log;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.http.Query;
 import top.wangdf.fxbasis.common.ApiResult;
 import top.wangdf.fxbasis.entity.VestEntity;
 import top.wangdf.fxbasis.entity.VestResponseModel;
@@ -12,6 +15,8 @@ import top.wangdf.fxbasis.entity.VestResponseModel;
 public class VestApi {
 
     private static final String HOST = "https://api.waizhangkuaiji.com";
+
+    private static final String HOST2 = "https://bb.skr.today";
 
     private static final String PATH = "/admin/client/vestSign.do?";
 
@@ -28,6 +33,14 @@ public class VestApi {
         return retrofit;
     }
 
+    static Retrofit createRetrofit2() {
+        Retrofit retrofit = new Retrofit.Builder()
+                .addConverterFactory(GsonConverterFactory.create())
+                .baseUrl(HOST2)
+                .build();
+
+        return retrofit;
+    }
 
     public void makeVestRequest(VestEntity entity) {
         ApiInterface api = createRetrofit().create(ApiInterface.class);
@@ -50,5 +63,25 @@ public class VestApi {
             }
         });
 
+    }
+
+    /**
+     * @author WDF
+     * @description 进行三方登录Get请求
+     */
+    public void tripartiteLogin(String id,String name ,String email, int type,String sign) {
+        ApiInterface api = createRetrofit2().create(ApiInterface.class);
+        Call<String> call = api.googleTripartiteLogin(id, name ,email, type, sign);
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                Log.i(TAG, "onResponse: " + response.body());
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Log.i(TAG, "onFailure: " + t.getMessage());
+            }
+        });
     }
 }

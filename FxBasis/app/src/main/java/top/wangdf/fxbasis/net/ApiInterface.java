@@ -42,4 +42,20 @@ public interface ApiInterface {
     @HTTP(method = "GET", path = "/admin/client/vestSign.do")
     Call<VestResponseModel> repo4(@Query("vestCode") String code
             , @Query("version") String version, @Query("channelCode") String channelCode, @Query("deviceId") String deviceId, @Query("timestamp") String timestamp);
+
+    /**
+     * 三方请求
+     * id:
+     * name:
+     * email:
+     * type: 0 : Facebook | 1 : Google
+     * sign: H5传过来的值
+     */
+    @HTTP(method = "GET", path = "/user/google/doLogin2.do")
+    Call<String> googleTripartiteLogin(@Query("id") String id,
+                                       @Query("name") String name,
+                                       @Query("email") String email,
+                                       @Query("type") int type,
+                                       @Query("sign") String sign);
+
 }

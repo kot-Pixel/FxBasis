@@ -2,6 +2,20 @@ apply plugin: 'com.android.application'
 apply plugin: 'com.google.gms.google-services'
 
 android {
+    signingConfigs {
+        FxBasis {
+            storeFile file('C:\\Users\\86180\\Desktop\\fxbasis.jks')
+            storePassword 'wangdaofeng'
+            keyAlias 'FxBasis'
+            keyPassword 'wangdaofeng'
+        }
+        debug {
+            storeFile file('C:\\Users\\86180\\Desktop\\fxbasis.jks')
+            keyAlias 'FxBasis'
+            keyPassword 'wangdaofeng'
+            storePassword 'wangdaofeng'
+        }
+    }
     compileSdkVersion 29
 
     defaultConfig {
@@ -14,7 +28,8 @@ android {
         //支持arm 32/64 x86 32/64
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
-//        multiDexEnabled true
+        multiDexEnabled true
+        signingConfig signingConfigs.FxBasis
     }
 
     buildTypes {
@@ -24,13 +39,15 @@ android {
         }
     }
 
-//    compileOptions {
-//        // Flag to enable support for the new language APIs
-//        coreLibraryDesugaringEnabled true
-//        // Sets Java compatibility to Java 8
-//        sourceCompatibility JavaVersion.VERSION_1_8
-//        targetCompatibility JavaVersion.VERSION_1_8
-//    }
+    compileOptions {
+        // Flag to enable support for the new language APIs
+        coreLibraryDesugaringEnabled true
+        // Sets Java compatibility to Java 8
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+
 }
 
 dependencies {
@@ -52,11 +69,12 @@ dependencies {
     implementation 'com.huawei.hms:ads-identifier:3.4.28.305'
     implementation 'com.google.firebase:firebase-core:18.0.0'
 
+
     //Google登录
     implementation 'com.google.android.gms:play-services-auth:19.0.0'
 
     // Import the BoM for the Firebase platform
-    implementation platform('com.google.firebase:firebase-bom:26.0.0')
+    implementation platform('com.google.firebase:firebase-bom:26.1.0')
 
     // Declare the dependency for the Firebase Authentication library
     // When using the BoM, you don't specify versions in Firebase library dependencies
@@ -67,5 +85,5 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
-//    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.9'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.0.9'
 }
