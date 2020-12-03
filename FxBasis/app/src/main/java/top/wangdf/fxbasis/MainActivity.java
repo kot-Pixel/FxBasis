@@ -2,6 +2,7 @@ package top.wangdf.fxbasis;
 
 import android.os.Bundle;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -9,14 +10,24 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.FirebaseOptions;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import top.wangdf.fxbasis.common.Utils;
 import top.wangdf.fxbasis.entity.VestEntity;
 import top.wangdf.fxbasis.net.VestApi;
+import top.wangdf.fxbasis.services.FireMessagingService;
+
 import android.content.Intent;
 import android.util.Log;
 import android.widget.Toast;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,14 +45,47 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         VestApi api = new VestApi();
+//        startService(new Intent(this, FireMessagingService.class));
+
+
         //请求接口
         //api.makeVestRequest(new VestEntity("Q11KF9MU","1.0", Utils.getDeviceId(MainActivity.this), Utils.getTimeStamp(),"google"));
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestEmail()
+//        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+//                .requestEmail()
+//                .build();
+//
+//        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+//        startActivityForResult(mGoogleSignInClient.getSignInIntent(), RC_SIGN_IN);
+        /**
+         * <resources>
+         *     <string name="firebase_database_url" translatable="false">https://fxbasisone-1606737618140.firebaseio.com</string>
+         *     <string name="gcm_defaultSenderId" translatable="false">393053980436</string>
+         *     <string name="google_api_key" translatable="false">AIzaSyAe0nozTGKBPLdKgs7PIudDJLW-mL52snc</string>
+         *     <string name="google_app_id" translatable="false">1:393053980436:android:f72f576f60d416dff36401</string>
+         *     <string name="google_crash_reporting_api_key" translatable="false">AIzaSyAe0nozTGKBPLdKgs7PIudDJLW-mL52snc</string>
+         *     <string name="google_storage_bucket" translatable="false">fxbasisone-1606737618140.appspot.com</string>
+         *     <string name="project_id" translatable="false">fxbasisone-1606737618140</string>
+         * </resources>
+         */
+        FirebaseOptions options = new FirebaseOptions.Builder()
+                .setApplicationId("1:820777635006:android:8e29918175bde636c8e2ef") // Required for Analytics.
+                .setProjectId("fxbasis-820777635006") // Required for Firebase Installations.
+                .setApiKey("AIzaSyD4p5id4CDHHbh3NFtEc4LYa1OquvnpP6E")
                 .build();
+        FirebaseApp.initializeApp(this, options, "FxBasis");
+//        //Toast.makeText(this, FirebaseMessaging.getInstance().getToken().getResult()+"", Toast.LENGTH_SHORT).show();
+        FirebaseMessaging.getInstance().getToken()
+                .addOnCompleteListener(task -> {
+                    if (!task.isSuccessful()) {
+                        Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+                        return;
+                    }
 
-        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-        startActivityForResult(mGoogleSignInClient.getSignInIntent(), RC_SIGN_IN);
+                    // Get new FCM registration token
+                    String token = task.getResult();
+                    Log.d(TAG, token);
+                    Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
+                });
     }
 
     @Override

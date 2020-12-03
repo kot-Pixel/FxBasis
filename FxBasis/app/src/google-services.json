@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "820777635006",
+    "firebase_url": "https://fxbasis.firebaseio.com",
+    "project_id": "fxbasis",
+    "storage_bucket": "fxbasis.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:820777635006:android:8e29918175bde636c8e2ef",
+        "android_client_info": {
+          "package_name": "top.wangdf.fxbasis"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "820777635006-a000dgc768ipipgl16mbu7f9l54u1cg2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "top.wangdf.fxbasis",
+            "certificate_hash": "71d3b3f4f19a5d5b9ab8363b0a7ed67d6428f22c"
+          }
+        },
+        {
+          "client_id": "820777635006-kluqkt3r6fppahr6ba21tg43o7jj451b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD4p5id4CDHHbh3NFtEc4LYa1OquvnpP6E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "820777635006-kluqkt3r6fppahr6ba21tg43o7jj451b.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
