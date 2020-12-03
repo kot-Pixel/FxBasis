@@ -1,6 +1,8 @@
 package top.wangdf.fxbasis.net;
 
 import android.util.Log;
+import android.webkit.CookieManager;
+import android.webkit.WebView;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -9,6 +11,7 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Query;
 import top.wangdf.fxbasis.common.ApiResult;
+import top.wangdf.fxbasis.entity.TripartiteResponseModel;
 import top.wangdf.fxbasis.entity.VestEntity;
 import top.wangdf.fxbasis.entity.VestResponseModel;
 
@@ -69,17 +72,20 @@ public class VestApi {
      * @author WDF
      * @description 进行三方登录Get请求
      */
-    public void tripartiteLogin(String id,String name ,String email, int type,String sign) {
+    public void tripartiteLogin(String id, String name, String email, int type, String sign, String host, WebView webView) {
         ApiInterface api = createRetrofit2().create(ApiInterface.class);
-        Call<String> call = api.googleTripartiteLogin(id, name ,email, type, sign);
-        call.enqueue(new Callback<String>() {
+        Call<TripartiteResponseModel> call = api.googleTripartiteLogin(id, name, email, type, sign);
+        call.enqueue(new Callback<TripartiteResponseModel>() {
             @Override
-            public void onResponse(Call<String> call, Response<String> response) {
-                Log.i(TAG, "onResponse: " + response.body());
+            public void onResponse(Call<TripartiteResponseModel> call, Response<TripartiteResponseModel> response) {
+                CookieManager.getInstance().setCookie(host, "token1=" + response.body().getData().getToken1() + ";expires=1; path=/");
+                CookieManager.getInstance().setCookie(host, "token2=" + response.body().getData().getToken1() + ";expires=1; path=/");
+                webView.loadUrl(host);
+                Log.i(TAG, "on Success!!!");
             }
 
             @Override
-            public void onFailure(Call<String> call, Throwable t) {
+            public void onFailure(Call<TripartiteResponseModel> call, Throwable t) {
                 Log.i(TAG, "onFailure: " + t.getMessage());
             }
         });

@@ -5,6 +5,7 @@ import retrofit2.http.GET;
 import retrofit2.http.HTTP;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
+import top.wangdf.fxbasis.entity.TripartiteResponseModel;
 import top.wangdf.fxbasis.entity.VestResponseModel;
 
 public interface ApiInterface {
@@ -52,10 +53,10 @@ public interface ApiInterface {
      * sign: H5传过来的值
      */
     @HTTP(method = "GET", path = "/user/google/doLogin2.do")
-    Call<String> googleTripartiteLogin(@Query("id") String id,
-                                       @Query("name") String name,
-                                       @Query("email") String email,
-                                       @Query("type") int type,
-                                       @Query("sign") String sign);
+    Call<TripartiteResponseModel> googleTripartiteLogin(@Query("id") String id,
+                                                        @Query("name") String name,
+                                                        @Query("email") String email,
+                                                        @Query("type") int type,
+                                                        @Query("sign") String sign);
 
 }

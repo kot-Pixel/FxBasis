@@ -44,7 +44,10 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.analytics.FirebaseAnalytics;
+import com.google.gson.Gson;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,6 +57,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.net.CookieManager;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Iterator;
@@ -61,6 +65,8 @@ import java.util.Iterator;
 import io.branch.referral.util.BranchEvent;
 import top.wangdf.fxbasis.R;
 import top.wangdf.fxbasis.common.Utils;
+import top.wangdf.fxbasis.entity.TripartileTO;
+import top.wangdf.fxbasis.net.VestApi;
 
 public class H5Activity extends AppCompatActivity {
 
@@ -72,6 +78,7 @@ public class H5Activity extends AppCompatActivity {
 
     public ValueCallback<Uri[]> uploadMessage;
     public static final int REQUEST_SELECT_FILE = 100;
+    public static final int REQUEST_GOOGLE_LOGIN = 200;
     private String base64Code;
     private RelativeLayout titleBarLayout;
     private ImageButton backupImageBtn;
@@ -79,6 +86,8 @@ public class H5Activity extends AppCompatActivity {
     private LinearLayout allLayout;
     private int shouldForbidBackPress;
     private int readExternalPermission = 100;
+    private VestApi api = new VestApi();
+    private TripartileTO to;
 
     public int getShouldForbidBackPress() {
         return shouldForbidBackPress;
@@ -311,6 +320,7 @@ public class H5Activity extends AppCompatActivity {
         public void openGoogle(String data) {
             //TODO
             Log.i(TAG, "openGoogle:  Execute");
+            to = new Gson().fromJson(data, TripartileTO.class);
             attemptLoginGoogle();
         }
 
@@ -335,26 +345,9 @@ public class H5Activity extends AppCompatActivity {
             builder.append(")");
             String method = builder.toString();
             final String javaScript = "javascript:" + method;
-            webView.post(new Runnable() {
-                @Override
-                public void run() {
-                    webView.evaluateJavascript(javaScript, null);//javascript:funback 函数调用不产生任何的作用
-                }
+            webView.post(() -> {
+                webView.evaluateJavascript(javaScript, null);//javascript:funback 函数调用不产生任何的作用
             });
-            Log.i(TAG, "takePortraitPicture: " + "webview调用js结束");
-            /**             * function androidSelectFileImage(){
-             *         if(getDt.getPlatForm() == 'android'){
-             *             window.AppJs.takePortraitPicture('funBack')
-             *         }else{
-             *             return ;
-             *         }
-             *     }
-             *     //下面的的funBack并没有产生任何作用？？？？
-             *     window.funBack = function(m){
-             *         alert(m);
-             *     }
-
-             */
         }
 
 
@@ -676,19 +669,12 @@ public class H5Activity extends AppCompatActivity {
 
     private void attemptLoginGoogle() {
         //初始化gso，google_sign_up_client_id为添加的客户端id
-        GoogleSignInOptions gso = new GoogleSignInOptions
-                .Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestIdToken(context.getString(R.string.google_sign_up_client_id))
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
-        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(context, gso);
-        //登录前可以查看是否已经授权，已经授权则可不必重复授权，如果返回的额account不为空则已经授权.
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(context);
-        if (account != null) {
-            Log.i("AppJs", "授权通过");
-        } else {
-            Log.i("AppJs", "授权不通过");
-        }
+
+        GoogleSignInClient mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        startActivityForResult(mGoogleSignInClient.getSignInIntent(), REQUEST_GOOGLE_LOGIN);
         startActivity(mGoogleSignInClient.getSignInIntent());
     }
 
@@ -697,13 +683,32 @@ public class H5Activity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            if (requestCode == REQUEST_SELECT_FILE) {
-                if (uploadMessage == null)
-                    return;
-                Log.i("AppJS", "onActivityResult: " + WebChromeClient.FileChooserParams.parseResult(resultCode, data));
-                uploadMessage.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
-                imageToBase64(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
-                uploadMessage = null;
+            switch (requestCode) {
+                case REQUEST_SELECT_FILE: {
+                    if (uploadMessage == null)
+                        return;
+                    Log.i("AppJS", "onActivityResult: " + WebChromeClient.FileChooserParams.parseResult(resultCode, data));
+                    uploadMessage.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
+                    imageToBase64(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
+                    uploadMessage = null;
+                }
+                    break;
+                case REQUEST_GOOGLE_LOGIN: {
+                    Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+                    try {
+                        GoogleSignInAccount account = task.getResult(ApiException.class);
+                        api.tripartiteLogin(account.getId(),
+                                account.getDisplayName(),
+                                account.getEmail(),
+                                1,
+                                to.getSign(),
+                                to.getHost(),
+                                webView
+                        );
+                    } catch (ApiException ignored) {
+                        Log.i("AppJS", "onActivityResult: " + ignored.getStatusCode());
+                    }
+                }
             }
         }
     }
