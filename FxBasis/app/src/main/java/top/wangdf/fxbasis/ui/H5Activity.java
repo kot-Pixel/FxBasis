@@ -65,6 +65,7 @@ import java.util.Iterator;
 import io.branch.referral.util.BranchEvent;
 import top.wangdf.fxbasis.R;
 import top.wangdf.fxbasis.common.Utils;
+import top.wangdf.fxbasis.entity.PureWebView;
 import top.wangdf.fxbasis.entity.TripartileTO;
 import top.wangdf.fxbasis.net.VestApi;
 
@@ -153,7 +154,7 @@ public class H5Activity extends AppCompatActivity {
         webSettings.setAppCachePath(getExternalCacheDir().getPath());
         webSettings.setDatabaseEnabled(true);
         webSettings.setCacheMode(WebSettings.LOAD_DEFAULT);
-//        webSettings.setEnableSmoothTransition(true);
+        webSettings.setEnableSmoothTransition(true);
         webSettings.setDomStorageEnabled(true);
         webSettings.setUseWideViewPort(true);
         webSettings.setLoadWithOverviewMode(true);
@@ -489,7 +490,8 @@ public class H5Activity extends AppCompatActivity {
         @JavascriptInterface
         public void openPureBrowser(String json) {
             //TODO
-            Log.i(TAG, "openPureBrowser:  Execute");
+            Intent intent = new Intent(context, PureH5Activity.class);
+            startActivity(intent);
         }
 
         /**

@@ -45,12 +45,12 @@ public class FireMessagingService extends FirebaseMessagingService {
             createNotification(getBaseContext(), pushMessage);
         }
 
-        RemoteMessage.Notification notification = remoteMessage.getNotification();
-        Log.i(TAG, "onMessageReceived: " + notification);
-        if (notification != null) {
-//            showNotification(getBaseContext(), notification);
-            Log.i(TAG, "onMessageReceived: " + notification.getBody());
-        }
+//        RemoteMessage.Notification notification = remoteMessage.getNotification();
+//        Log.i(TAG, "onMessageReceived: " + notification);
+//        if (notification != null) {
+////            showNotification(getBaseContext(), notification);
+//            Log.i(TAG, "onMessageReceived: " + notification.getBody());
+//        }
     }
 
     @Override

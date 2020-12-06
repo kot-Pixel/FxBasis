@@ -21,9 +21,12 @@ import top.wangdf.fxbasis.common.Utils;
 import top.wangdf.fxbasis.entity.VestEntity;
 import top.wangdf.fxbasis.net.VestApi;
 import top.wangdf.fxbasis.services.FireMessagingService;
+import top.wangdf.fxbasis.ui.PureH5Activity;
 
 import android.content.Intent;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import java.io.FileInputStream;
@@ -40,11 +43,36 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
 
+    private String data2 = " {" +
+            "\"title\":" +"\"Test\""+ ","+
+            "\"url\":" +"\"https://www.baidu.com\""+","+
+            "\"hasTitleBar\":" +"true"+","+
+            "\"rewriteTitle\":" +"true"+","+
+            "\"stateBarTextColor\":" +"\"white\""+","+
+            "\"titleTextColor\":" +"\"#000000\""+","+
+            "\"titleColor\":" +"\"#FFFFFF\""+","+
+            "\"postData\":" +"\"\""+","+
+            "\"html\":" +"\"\""+","+
+            "\"webBack\":" +"false"+
+            "}";
+
+    private Button button;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         VestApi api = new VestApi();
+        Log.i(TAG, "onCreate: " + data2);
+        button = findViewById(R.id.button1);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, PureH5Activity.class);
+                intent.putExtra("data" , data2);
+                startActivity(intent);
+            }
+        });
 //        startService(new Intent(this, FireMessagingService.class));
 
 
