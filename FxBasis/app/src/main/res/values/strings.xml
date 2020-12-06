@@ -3,4 +3,6 @@
     <string name="h5_titleBar_title">TitleBar</string>
     <string name="google_sign_up_client_id">393053980436-0gmr3n7k6ratp98gcro0vvu0uein9qqf.apps.googleusercontent.com</string>
     <string name="google_sign_up_android_client_id">393053980436-50hmcehku5gin8dde1bn3fqi7a5df32f.apps.googleusercontent.com</string>
+    <string name="facebook_app_id">612739596105644</string>
+    <string name="fb_login_protocol_scheme">fb612739596105644</string>
 </resources>

@@ -5,16 +5,18 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.FacebookSdk;
+import com.facebook.login.LoginManager;
+import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
-import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 import top.wangdf.fxbasis.common.Utils;
@@ -29,8 +31,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -58,12 +58,16 @@ public class MainActivity extends AppCompatActivity {
 
     private Button button;
 
+    private Button button_face;
+
+    private CallbackManager callbackManager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         VestApi api = new VestApi();
-        Log.i(TAG, "onCreate: " + data2);
+//        Log.i(TAG, "onCreate: " + data2);
         button = findViewById(R.id.button1);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,6 +77,27 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        button_face = findViewById(R.id.button2);
+
+        callbackManager = CallbackManager.Factory.create();
+
+        LoginManager.getInstance().registerCallback(callbackManager,
+                new FacebookCallback<LoginResult>() {
+                    @Override
+                    public void onSuccess(LoginResult loginResult) {
+                        Log.i(TAG, "onSuccess: ");
+                    }
+
+                    @Override
+                    public void onCancel() {
+                        // App code
+                    }
+
+                    @Override
+                    public void onError(FacebookException exception) {
+                        Log.i(TAG, "onError: " + exception.getCause());
+                    }
+                });
 //        startService(new Intent(this, FireMessagingService.class));
 
 
@@ -95,48 +120,48 @@ public class MainActivity extends AppCompatActivity {
          *     <string name="project_id" translatable="false">fxbasisone-1606737618140</string>
          * </resources>
          */
-        FirebaseOptions options = new FirebaseOptions.Builder()
-                .setApplicationId("1:820777635006:android:8e29918175bde636c8e2ef") // Required for Analytics.
-                .setProjectId("fxbasis-820777635006") // Required for Firebase Installations.
-                .setApiKey("AIzaSyD4p5id4CDHHbh3NFtEc4LYa1OquvnpP6E")
-                .build();
-        FirebaseApp.initializeApp(this, options, "FxBasis");
+//        FirebaseOptions options = new FirebaseOptions.Builder()
+//                .setApplicationId("1:820777635006:android:8e29918175bde636c8e2ef") // Required for Analytics.
+//                .setProjectId("fxbasis-820777635006") // Required for Firebase Installations.
+//                .setApiKey("AIzaSyD4p5id4CDHHbh3NFtEc4LYa1OquvnpP6E")
+//                .build();
+//        FirebaseApp.initializeApp(this, options, "FxBasis");
 //        //Toast.makeText(this, FirebaseMessaging.getInstance().getToken().getResult()+"", Toast.LENGTH_SHORT).show();
-        FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(task -> {
-                    if (!task.isSuccessful()) {
-                        Log.w(TAG, "Fetching FCM registration token failed", task.getException());
-                        return;
-                    }
-
-                    // Get new FCM registration token
-                    String token = task.getResult();
-                    Log.d(TAG, token);
-                    Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
-                });
+//        FirebaseMessaging.getInstance().getToken()
+//                .addOnCompleteListener(task -> {
+//                    if (!task.isSuccessful()) {
+//                        Log.w(TAG, "Fetching FCM registration token failed", task.getException());
+//                        return;
+//                    }
+//
+//                    // Get new FCM registration token
+//                    String token = task.getResult();
+//                    Log.d(TAG, token);
+//                    Toast.makeText(MainActivity.this, token, Toast.LENGTH_SHORT).show();
+//                });
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
+        callbackManager.onActivityResult(requestCode, resultCode, data);
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
-        if (requestCode == RC_SIGN_IN) {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            try {
-                // Google Sign In was successful, authenticate with Firebase
-                GoogleSignInAccount account = task.getResult(ApiException.class);
-                Log.i(TAG, "onActivityResult: " + account.getId());
-                Log.i(TAG, "onActivityResult: " + account.getDisplayName());
-                Log.i(TAG, "onActivityResult: " + account.getEmail());
-                //{"sign":"781h18fn1u34n","host":"https://bb.skr.today"}
-                /**
-                 * 成功获取到用户Google登录的信息
-                 */
-                //进行三方请求
-            } catch (ApiException ignored) {
-                Log.i(TAG, "onActivityResult: " + ignored.getStatusCode());
-            }
-        }
+//        if (requestCode == RC_SIGN_IN) {
+//            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+//            try {
+//                // Google Sign In was successful, authenticate with Firebase
+//                GoogleSignInAccount account = task.getResult(ApiException.class);
+//                Log.i(TAG, "onActivityResult: " + account.getId());
+//                Log.i(TAG, "onActivityResult: " + account.getDisplayName());
+//                Log.i(TAG, "onActivityResult: " + account.getEmail());
+//                //{"sign":"781h18fn1u34n","host":"https://bb.skr.today"}
+//                /**
+//                 * 成功获取到用户Google登录的信息
+//                 */
+//                //进行三方请求
+//            } catch (ApiException ignored) {
+//                Log.i(TAG, "onActivityResult: " + ignored.getStatusCode());
+//            }
+//        }
     }
 }
